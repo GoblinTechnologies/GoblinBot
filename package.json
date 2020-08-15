@@ -1,0 +1,43 @@
+{
+  "name": "goblinbot",
+  "version": "1.0.0",
+  "description": "GoblinBot gives you access to one bot that everyone has wished for. You can integrate with Twitch, Paypal, YouTube, and many other services. Unfortunately, the free version will only allow access to Twitch, YouTube, and Facebook Gaming.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "music",
+    "twitch",
+    "twitch",
+    "integration",
+    "youtube",
+    "youtube",
+    "integration",
+    "facebook",
+    "gaming",
+    "facebook",
+    "gaming",
+    "integration",
+    "twitter",
+    "twitter",
+    "integration"
+  ],
+  "author": "Steve 'Mythotical' Moore",
+  "license": UNLICENSED,
+  "dependencies": {
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "erlpack": "^0.1.3",
+    "ffmpeg-static": "^4.2.6",
+    "libsodium-wrappers": "^0.7.6",
+    "node-opus": "^0.3.3",
+    "opus": "0.0.0",
+    "opusscript": "0.0.7",
+    "utf-8-validate": "^5.0.2",
+    "zlib-sync": "^0.1.7"
+  }
+}
