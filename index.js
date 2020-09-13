@@ -3,6 +3,9 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
+const { Users, CurrencyShop } = require('./dbObjects');
+const { Op } = require('sequelize');
+const currency = new Discord.Collection();
 
 const bot = new Discord.Client();
 bot.commands = new Discord.Collection();
@@ -16,12 +19,39 @@ for (const file of commandFiles) {
 
 const cooldowns = new Discord.Collection();
 
+Reflect.defineProperty(currency, 'add', {
+	/* eslint-disable-next-line func-name-matching */
+	value: async function add(id, amount) {
+		const user = currency.get(id);
+		if (user) {
+			user.balance += Number(amount);
+			return user.save();
+		}
+		const newUser = await Users.create({ user_id: id, balance: amount });
+		currency.set(id, newUser);
+		return newUser;
+	},
+});
+
+Reflect.defineProperty(currency, 'getBalance', {
+	/* eslint-disable-next-line func-name-matching */
+	value: function getBalance(id) {
+		const user = currency.get(id);
+		return user ? user.balance : 0;
+	},
+});
+
 bot.once('ready', () => {
-  console.info(`Logged in as ${bot.user.tag}!`);
+	const storedBalances = await Users.findAll();
+	storedBalances.forEach(b => currency.set(b.user_id, b));
+	
+	console.info(`Logged in as ${bot.user.tag}!`);
 });
 
 bot.on('message', message => {
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
+	
+	if (message.content.indexOf(prefix) !== 0) return;
 
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
 	const commandName = args.shift().toLowerCase();
@@ -47,7 +77,7 @@ bot.on('message', message => {
 	if (!cooldowns.has(command.name)) {
 		cooldowns.set(command.name, new Discord.Collection());
 	}
-
+	
 	const now = Date.now();
 	const timestamps = cooldowns.get(command.name);
 	const cooldownAmount = (command.cooldown || 3) * 1000;
@@ -60,12 +90,12 @@ bot.on('message', message => {
 			return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
 		}
 	}
-
+	
 	timestamps.set(message.author.id, now);
 	setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
 	try {
-		command.execute(message, args);
+		command.execute(message, args, Tags);
 	} catch (error) {
 		console.error(error);
 		message.reply('there was an error trying to execute that command!');
